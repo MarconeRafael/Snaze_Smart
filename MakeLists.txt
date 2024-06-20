@@ -1,0 +1,21 @@
+cmake_minimum_required(VERSION 3.0)
+project(SnakeGame)
+
+# Definir as versões de C++
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Configuração para encontrar arquivos de cabeçalho e código fonte
+include_directories(include)
+file(GLOB SOURCES "src/*.cpp")
+file(GLOB HEADERS "include/*.h")
+
+# Adicionar os executáveis e vincular arquivos fonte e cabeçalhos
+add_executable(snakeGame ${SOURCES} ${HEADERS})
+
+# Configurações adicionais, como encontrar bibliotecas necessárias, etc.
+
+# Exemplo adicional:
+# find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
+# target_link_libraries(snakeGame sfml-graphics sfml-audio)
