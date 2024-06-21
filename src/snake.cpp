@@ -1,16 +1,19 @@
-//representa a cobra e seus atributos. A simulação do jogo deve ter apenas uma cobra
-
 #include "snake.h"
 
 Snake::Snake(const std::pair<int, int>& startPos) : currentDirection(Direction::UP) {
     body.push_front(startPos);
 }
 
-void Snake::move(Direction dir) {
-    // Atualizar a direção da cobra
-    currentDirection = dir;
+std::pair<int, int> Snake::headPosition() const {
+    return body.front();
+}
 
-    // Determinar a nova posição da cabeça da cobra
+Direction Snake::getCurrentDirection() const {
+    return currentDirection;
+}
+
+void Snake::move(Direction dir) {
+    currentDirection = dir;
     std::pair<int, int> head = body.front();
     switch (dir) {
         case Direction::UP:
@@ -29,30 +32,26 @@ void Snake::move(Direction dir) {
 }
 
 bool Snake::checkCollision(int numRows, int numCols, const std::vector<std::vector<char>>& grid) {
-    // Verificar colisão com as paredes
     std::pair<int, int> head = body.front();
     if (head.first < 0 || head.first >= numRows || head.second < 0 || head.second >= numCols) {
         return true; // Colidiu com uma parede
     }
 
-    // Verificar colisão com o próprio corpo
-    for (size_t i = 1; i < body.size(); ++i) {
+    for (std::size_t i = 1; i < body.size(); ++i) {
         if (head == body[i]) {
             return true; // Colidiu com o próprio corpo
         }
     }
 
-    // Verificar colisão com as paredes do labirinto
     if (grid[head.first][head.second] == '#') {
         return true; // Colidiu com uma parede do labirinto
     }
 
-    return false; // Sem colisão
+    return false;
 }
 
 void Snake::grow() {
-    // Não remover a cauda para crescer
-    // A função move() adicionará uma nova cabeça, aumentando o tamanho do corpo
+    // A função grow não remove a cauda, pois a função move() adicionará uma nova cabeça automaticamente
 }
 
 std::pair<int, int> Snake::headPosition() {

@@ -1,16 +1,23 @@
-/*
-a entidade principal que instancia todos os outros objetos e gerencia o jogo ex-
-ecução. Esta classe deve fornecer métodos, como inicialize_game() , update() ,
-process_events() , render() , game_over() , que são chamados no loop do jogo.
-Eu recomendo que você organize sua arquitetura de código seguindo o procedimento tradicional do Game Loop.
-padrão de gramática.    
-*/
-
 #include "snakeGame.h"
 #include <iostream>
 
 SnakeGame::SnakeGame(const std::string& levelFile)
-    : snake(levelFile), player(level.getFoodPosition(), level.getGrid()), level(levelFile), gameState(GameState::RUNNING) {}
+    : snake({0, 0}), // Inicialize a cobra com uma posição padrão (pode ser ajustada conforme necessário)
+      player({level.getSnakeSpawn(), level.getGrid()}), // Inicialize o jogador com a posição inicial do snake e o grid do nível
+      level() // Inicialize o nível
+{
+    // Carrega o nível a partir do arquivo
+    if (!level.loadFromFile(levelFile)) {
+        std::cerr << "Erro ao carregar o arquivo do nível: " << levelFile << std::endl;
+        // Lógica para lidar com falha ao carregar o nível
+    }
+
+    // Inicializa a cobra com a posição inicial do spawn do snake no nível
+    snake = Snake(level.getSnakeSpawn());
+
+    // Define o estado inicial do jogo para EXECUTANDO
+    gameState = GameState::RUNNING;
+}
 
 void SnakeGame::run() {
     while (gameState == GameState::RUNNING) {
@@ -76,4 +83,11 @@ bool SnakeGame::isLevelComplete() {
 void SnakeGame::resetLevel() {
     // Lógica para reiniciar o nível
     // Isso pode incluir resetar a posição da cobra, da comida e redefinir o estado do jogo
+}
+
+int main() {
+    SnakeGame game("../data/levels.txt"); 
+    game.run();
+
+    return 0;
 }

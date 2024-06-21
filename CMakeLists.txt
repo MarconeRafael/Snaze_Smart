@@ -11,11 +11,12 @@ include_directories(include)
 file(GLOB SOURCES "src/*.cpp")
 file(GLOB HEADERS "include/*.h")
 
+# Remover a referência a main.cpp e adicionar apenas snakeGame.cpp
+list(REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
+list(APPEND SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/snakeGame.cpp")
+
 # Adicionar os executáveis e vincular arquivos fonte e cabeçalhos
 add_executable(snakeGame ${SOURCES} ${HEADERS})
 
-# Configurações adicionais, como encontrar bibliotecas necessárias, etc.
-
-# Exemplo adicional:
-# find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
-# target_link_libraries(snakeGame sfml-graphics sfml-audio)
+# Definições de compilador e flags
+target_compile_options(snakeGame PRIVATE -Wall -Wextra -pedantic)

@@ -1,7 +1,10 @@
+// player.cpp
 #include "player.h"
-#include <iostream>
 #include <queue>
+#include <vector>
+#include <iostream>
 #include <climits>
+#include <cstdlib>
 
 Player::Player(const std::pair<int, int>& foodPos, const std::vector<std::vector<char>>& gameGrid)
     : foodPosition(foodPos), grid(gameGrid) {}
@@ -9,44 +12,40 @@ Player::Player(const std::pair<int, int>& foodPos, const std::vector<std::vector
 Direction Player::nextMove(const Snake& snake) {
     if (directions.empty()) {
         if (!findSolution(snake)) {
-            // Se não houver solução, mova-se aleatoriamente
             std::vector<Direction> possibleMoves;
             std::pair<int, int> head = snake.headPosition();
             int row = head.first;
             int col = head.second;
 
-            // Verificar movimentos permitidos de acordo com as regras
-            bool canMoveLeft = (row % 2 == 0 && col > 0 && grid[row][col - 1] != '#');
-            bool canMoveRight = (row % 2 == 1 && col < grid[0].size() - 1 && grid[row][col + 1] != '#');
-            bool canMoveUp = (col % 2 == 1 && row > 0 && grid[row - 1][col] != '#');
-            bool canMoveDown = (col % 2 == 0 && row < grid.size() - 1 && grid[row + 1][col] != '#');
-
-            // Adicionar movimentos possíveis à lista
-            if (canMoveLeft) {
-                possibleMoves.push_back(Direction::LEFT);
-            }
-            if (canMoveRight) {
-                possibleMoves.push_back(Direction::RIGHT);
-            }
-            if (canMoveUp) {
-                possibleMoves.push_back(Direction::UP);
-            }
-            if (canMoveDown) {
-                possibleMoves.push_back(Direction::DOWN);
+            if (row % 2 == 0) {
+                if (col > 0 && grid[row][col - 1] != '#') {
+                    possibleMoves.push_back(Direction::LEFT);
+                }
+            } else {
+                if (col < grid[0].size() - 1 && grid[row][col + 1] != '#') {
+                    possibleMoves.push_back(Direction::RIGHT);
+                }
             }
 
-            // Escolher aleatoriamente se há mais de uma opção
+            if (col % 2 == 0) {
+                if (row < grid.size() - 1 && grid[row + 1][col] != '#') {
+                    possibleMoves.push_back(Direction::DOWN);
+                }
+            } else {
+                if (row > 0 && grid[row - 1][col] != '#') {
+                    possibleMoves.push_back(Direction::UP);
+                }
+            }
+
             if (!possibleMoves.empty()) {
                 int randIdx = std::rand() % possibleMoves.size();
                 return possibleMoves[randIdx];
             }
 
-            // Caso contrário, continuar na direção atual
-            return snake.getCurrentDirection();
+            return snake.getCurrentDirection(); // Utiliza o método para obter a direção atual
         }
     }
 
-    // Retirar a direção da fila de direções e retornar
     Direction nextDir = directions.front();
     directions.pop();
     return nextDir;
@@ -74,9 +73,7 @@ bool Player::findSolution(const Snake& snake) {
         if (visited[row][col]) continue;
         visited[row][col] = true;
 
-        // Verificar se alcançamos a comida
         if (std::make_pair(row, col) == foodPosition) {
-            // Reconstruir o caminho
             std::pair<int, int> step = foodPosition;
             while (step != head) {
                 directions.push(convertToDirection(previous[step.first][step.second], step));
@@ -85,13 +82,18 @@ bool Player::findSolution(const Snake& snake) {
             return true;
         }
 
-        // Vizinhos possíveis
-        std::vector<std::pair<int, int>> neighbors = {
-            {row - 1, col}, // Up
-            {row + 1, col}, // Down
-            {row, col - 1}, // Left
-            {row, col + 1}  // Right
-        };
+        std::vector<std::pair<int, int>> neighbors;
+        if (row % 2 == 0) {
+            if (col > 0) neighbors.push_back({row, col - 1}); // Left
+        } else {
+            if (col < numCols - 1) neighbors.push_back({row, col + 1}); // Right
+        }
+
+        if (col % 2 == 0) {
+            if (row < numRows - 1) neighbors.push_back({row + 1, col}); // Down
+        } else {
+            if (row > 0) neighbors.push_back({row - 1, col}); // Up
+        }
 
         for (auto neighbor : neighbors) {
             int newRow = neighbor.first;
@@ -108,7 +110,6 @@ bool Player::findSolution(const Snake& snake) {
         }
     }
 
-    // Se chegarmos aqui, não há caminho para a comida
     return false;
 }
 
@@ -117,15 +118,9 @@ bool Player::isValid(int row, int col, int numRows, int numCols, const std::vect
 }
 
 Direction Player::convertToDirection(const std::pair<int, int>& from, const std::pair<int, int>& to) {
-    if (from.first == to.first + 1) {
-        return Direction::DOWN;
-    } else if (from.first == to.first - 1) {
-        return Direction::UP;
-    } else if (from.second == to.second + 1) {
-        return Direction::RIGHT;
-    } else if (from.second == to.second - 1) {
-        return Direction::LEFT;
+    if (from.first == to.first) {
+        return (from.second < to.second) ? Direction::RIGHT : Direction::LEFT;
+    } else {
+        return (from.first < to.first) ? Direction::DOWN : Direction::UP;
     }
-    // Retornar uma direção padrão em caso de erro ou situação não esperada
-    return Direction::UP; // Aqui pode ser qualquer direção padrão
 }

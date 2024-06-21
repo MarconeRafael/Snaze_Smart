@@ -1,21 +1,34 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "snake.h"
-#include <vector>
 #include <queue>
+#include <vector>
 #include <utility>
+#include "snake.h"
+#include "level.h"
 
 class Player {
 private:
-    std::queue<Direction> directions; // Fila de direções para a cobra seguir
-    std::pair<int, int> foodPosition; // Posição da comida
-    std::vector<std::vector<char>> grid; // Labirinto
+    std::pair<int, int> foodPosition;
+    std::vector<std::vector<char>> grid;
+    std::queue<Direction> directions;
+
+    bool isValid(int row, int col, int numRows, int numCols, const std::vector<std::vector<char>>& grid, const std::vector<std::vector<bool>>& visited);
+    Direction convertToDirection(const std::pair<int, int>& from, const std::pair<int, int>& to);
 
 public:
     Player(const std::pair<int, int>& foodPos, const std::vector<std::vector<char>>& gameGrid);
-    Direction nextMove(const Snake& snake); // Determina a próxima direção para a cobra
-    bool findSolution(const Snake& snake); // Encontra uma solução para guiar a cobra até a comida
+
+    bool findSolution(const Snake& snake);
+    Direction nextMove(const Snake& snake);
+};
+
+struct Cell {
+    int row, col, dist;
+    Cell(int r, int c, int d) : row(r), col(c), dist(d) {}
+    bool operator>(const Cell& other) const {
+        return dist > other.dist;
+    }
 };
 
 #endif // PLAYER_H

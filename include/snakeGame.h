@@ -1,3 +1,4 @@
+// snakeGame.h
 #ifndef SNAKEGAME_H
 #define SNAKEGAME_H
 
